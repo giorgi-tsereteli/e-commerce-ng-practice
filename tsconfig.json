@@ -22,6 +22,7 @@
       "es2020",
       "dom"
     ],
+    // Added following due to errors in some external libraries
     "skipLibCheck": true
   },
   "angularCompilerOptions": {
