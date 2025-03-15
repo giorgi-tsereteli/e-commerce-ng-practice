@@ -1,9 +1,10 @@
-<mat-card [ngClass]="{ 'text-center': !fullWidthMode }">
+<!-- ngIf was added to check if product is defined. Angular needs ? in case var might be undefined -->
+<mat-card *ngIf="product" [ngClass]="{ 'text-center': !fullWidthMode }">
   <div [ngClass]="{ flex: fullWidthMode }">
     <img
       class="mb-1 mx-auto"
       [ngClass]="{ 'h-[200px]': !fullWidthMode, 'h-[360px]': fullWidthMode }"
-      src="https://picsum.photos/150"
+      [src]="product.image"
       alt="Product Image"
     />
 
@@ -13,13 +14,13 @@
       [ngClass]="{ 'px-8 flex flex-col justify-between': fullWidthMode }"
     >
       <div>
-        <h5>Shoes</h5>
-        <p class="truncate hover:whitespace-normal">Sneakers</p>
-        <p *ngIf="fullWidthMode">Description - lorem</p>
+        <h5>{{product.category}}</h5>
+        <p class="truncate hover:whitespace-normal">{{product.title}}</p>
+        <p *ngIf="fullWidthMode">{{product.description}}</p>
       </div>
       <div class="flex justify-between items-center">
         <span class="text-red-400 font-bold">{{
-          "150" | currency : "USD"
+          product.price| currency : "USD"
         }}</span>
         <button (click)="onAddToCart()" mat-button>
           <mat-icon class="text-grey-500">shopping_cart</mat-icon>

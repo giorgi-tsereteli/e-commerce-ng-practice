@@ -1,6 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
 import { Product } from "src/app/models/product.model";
 import { CartService } from "src/app/services/cart.service";
+import { StoreService } from "src/app/services/store.service";
 
 const ROWS_HEIGHT: { [id: number]: number } = {
   // The values associated with those keys are also of type number
@@ -15,14 +17,40 @@ const ROWS_HEIGHT: { [id: number]: number } = {
   selector: "app-home",
   templateUrl: "./home.component.html",
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   cols = 3;
   rowHeight = ROWS_HEIGHT[this.cols];
   category: string | undefined;
 
-  constructor(private cartService: CartService) {}
+  // Following 4 lines are all for api implementation
+  products: Array<Product> | undefined;
+  sort = "desc";
+  count = 12;
+  productsSubscription: Subscription | undefined;
 
-  ngOnInit(): void {}
+  constructor(
+    private cartService: CartService,
+    private storeService: StoreService
+  ) {}
+
+  ngOnInit(): void {
+    this.getProducts();
+  }
+
+  ngOnDestroy(): void {
+    // This method is called when the component is destroyed to avoid memory leaks
+    if (this.productsSubscription) {
+      this.productsSubscription.unsubscribe();
+    }
+  }
+
+  getProducts(): void {
+    this.productsSubscription = this.storeService
+      .getAllProducts(this.count, this.sort)
+      .subscribe((_products) => {
+        this.products = _products;
+      });
+  }
 
   // This method is called for click event on column count icons
   onColumnsCountChanged(colsNum: number): void {
