@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   getProducts(): void {
     this.productsSubscription = this.storeService
-      .getAllProducts(this.count, this.sort)
+      .getAllProducts(this.count, this.sort, this.category)
       .subscribe((_products) => {
         this.products = _products;
       });
@@ -60,6 +60,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onShowCategory(newCategory: string): void {
     this.category = newCategory;
+    this.getProducts();
   }
 
   onAddToCart(product: Product): void {
@@ -71,5 +72,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       quantity: 1,
       id: product.id,
     });
+  }
+
+  // This method is called for click event on items count icons. Event is emitted from products-header.component.ts
+  onItemsCountChange(newCount: number): void {
+    this.count = newCount;
+    this.getProducts(); // This method is called to get products from the api after the count is changed
+  }
+
+  onItemsSortChange(newSort: string): void {
+    this.sort = newSort;
+    this.getProducts();
   }
 }
