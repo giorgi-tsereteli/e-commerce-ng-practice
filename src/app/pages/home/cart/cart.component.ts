@@ -1,4 +1,6 @@
+import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
+import { loadStripe } from "@stripe/stripe-js";
 import { Cart, CartItem } from "src/app/models/cart.model";
 import { CartService } from "src/app/services/cart.service";
 
@@ -38,7 +40,7 @@ export class CartComponent implements OnInit {
     "action",
   ];
 
-  constructor(private cartService: CartService) {}
+  constructor(private cartService: CartService, private http: HttpClient) {}
 
   ngOnInit(): void {
     // Subscribe to cart changes to update the cart items
@@ -66,7 +68,7 @@ export class CartComponent implements OnInit {
   }
 
   onAddQuantity(item: CartItem): void {
-    this.cartService.addToCart(item)
+    this.cartService.addToCart(item);
     // Initially u made another func in service to add quantity
     // The logic of += 1 is already within addToCart method in the service class
     // this.cartService.addQuantity(item);
@@ -76,5 +78,19 @@ export class CartComponent implements OnInit {
     this.cartService.removeQuantity(item);
   }
 
-  
+  onCheckout(): void {
+    console.log("Checkout");
+    this.http
+      .post("http://localhost:4242/checkout", {
+        items: this.cart.items,
+      })
+      .subscribe(async (res: any) => {
+        let stripe = await loadStripe(
+          "pk_test_51R36qeHhN0WnAkU4X3aE6L2oZnENo7NN0EHl2dgcOmB1mZTP0DX8YmmP91DUqyI5cJUC4EwRtzrfpdOLrIgeECM800D4YATL2y"
+        );
+        stripe?.redirectToCheckout({
+          sessionId: res.id,
+        });
+      });
+  }
 }
